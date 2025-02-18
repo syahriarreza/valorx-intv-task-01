@@ -8,4 +8,5 @@ type Usecase interface {
 	UpdateUser(user *models.User) error
 	DeleteUser(id string) error
 	Login(email, password string) (*models.User, error)
+	GetUserByEmail(email string) (*models.User, error) // New method for OAuth
 }

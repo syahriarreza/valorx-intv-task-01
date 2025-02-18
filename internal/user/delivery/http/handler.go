@@ -5,7 +5,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
 
+	"github.com/syahriarreza/valorx-intv-task-01/internal/oauth"
 	"github.com/syahriarreza/valorx-intv-task-01/internal/user"
 	"github.com/syahriarreza/valorx-intv-task-01/pkg/models"
 )
@@ -25,16 +27,37 @@ func NewUserHandler(router *gin.Engine, us user.Usecase) {
 	router.DELETE("/users/:id", handler.DeleteUser)
 	router.POST("/login", handler.Login)
 
+	// OAuth routes
+	router.GET("/auth/google", handler.GoogleLogin)
+	router.GET("/callback", handler.GoogleCallback)
 }
 
 func (h *UserHandler) CreateUser(c *gin.Context) {
-	var user models.User
-	if err := c.ShouldBindJSON(&user); err != nil {
+	var request struct {
+		Name     string `json:"name"`
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+
+	if err := c.ShouldBindJSON(&request); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	user.ID = uuid.New()
+	// Hash the password
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to hash password"})
+		return
+	}
+
+	user := models.User{
+		ID:           uuid.New(),
+		Name:         request.Name,
+		Email:        request.Email,
+		PasswordHash: string(hashedPassword),
+	}
+
 	if err := h.UserUsecase.CreateUser(&user); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -98,4 +121,12 @@ func (h *UserHandler) Login(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, user)
+}
+
+func (h *UserHandler) GoogleLogin(c *gin.Context) {
+	oauth.HandleGoogleLogin(c.Writer, c.Request)
+}
+
+func (h *UserHandler) GoogleCallback(c *gin.Context) {
+	oauth.HandleGoogleCallback(c.Writer, c.Request, h.UserUsecase)
 }

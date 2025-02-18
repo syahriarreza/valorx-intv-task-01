@@ -9,6 +9,7 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/syahriarreza/valorx-intv-task-01/config"
+	"github.com/syahriarreza/valorx-intv-task-01/internal/oauth"
 	userHttp "github.com/syahriarreza/valorx-intv-task-01/internal/user/delivery/http"
 	userRepo "github.com/syahriarreza/valorx-intv-task-01/internal/user/repository/postgres"
 	userUsecase "github.com/syahriarreza/valorx-intv-task-01/internal/user/usecase"
@@ -16,6 +17,9 @@ import (
 
 func main() {
 	cfg := config.LoadConfig()
+
+	// Initialize OAuth configuration
+	oauth.InitializeOAuthConfig()
 
 	db, err := gorm.Open(postgres.Open(cfg.DatabaseDSN), &gorm.Config{})
 	if err != nil {

@@ -50,12 +50,16 @@ func (u *UserUsecase) DeleteUser(id string) error {
 }
 
 func (u *UserUsecase) Login(email, password string) (*models.User, error) {
-    user, err := u.UserRepo.GetUserByEmail(email)
-    if err != nil {
-        return nil, errors.New("invalid email or password")
-    }
-    if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password)); err != nil {
-        return nil, errors.New("invalid email or password")
-    }
-    return user, nil
+	user, err := u.UserRepo.GetUserByEmail(email)
+	if err != nil {
+		return nil, errors.New("invalid email or password")
+	}
+	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password)); err != nil {
+		return nil, errors.New("invalid email or password")
+	}
+	return user, nil
+}
+
+func (u *UserUsecase) GetUserByEmail(email string) (*models.User, error) {
+	return u.UserRepo.GetUserByEmail(email)
 }

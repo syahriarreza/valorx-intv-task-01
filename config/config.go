@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/spf13/viper"
@@ -23,7 +22,6 @@ func LoadConfig() *Config {
 	}
 
 	databaseDSN := viper.GetString("DATABASE_DSN")
-	fmt.Println("\n\n##### databaseDSN:", databaseDSN)
 	if databaseDSN == "" {
 		log.Fatal("DATABASE_DSN configuration is required")
 	}
