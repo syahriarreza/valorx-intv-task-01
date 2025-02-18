@@ -23,6 +23,8 @@ func NewUserHandler(router *gin.Engine, us user.Usecase) {
 	router.GET("/users/:id", handler.GetUserByID)
 	router.PUT("/users/:id", handler.UpdateUser)
 	router.DELETE("/users/:id", handler.DeleteUser)
+	router.POST("/login", handler.Login)
+
 }
 
 func (h *UserHandler) CreateUser(c *gin.Context) {
@@ -77,4 +79,23 @@ func (h *UserHandler) DeleteUser(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusNoContent, nil)
+}
+
+func (h *UserHandler) Login(c *gin.Context) {
+	var loginRequest struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+	if err := c.ShouldBindJSON(&loginRequest); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	user, err := h.UserUsecase.Login(loginRequest.Email, loginRequest.Password)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid email or password"})
+		return
+	}
+
+	c.JSON(http.StatusOK, user)
 }

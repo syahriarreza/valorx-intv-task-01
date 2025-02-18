@@ -52,8 +52,7 @@ func HandleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 	}
 	defer resp.Body.Close()
 
-	// Process the response to extract user information
-	// ...
+	// TODO: Process the response to extract user information
 
 	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 }

@@ -1,4 +1,4 @@
-module github.com/syahriarreza/github.com/syahriarreza/valorx-intv-task-01
+module github.com/syahriarreza/valorx-intv-task-01
 
 go 1.22.4
 
